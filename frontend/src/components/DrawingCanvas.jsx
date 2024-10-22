@@ -96,21 +96,32 @@ const DrawingCanvas = () => {
         setIsModalOpen(false);
     };
 
-    const calculateDrawing = () => {
+    const calculateDrawing = async () => {
         const canvas = canvasRef.current;
-        const imageDataURL = canvas.toDataURL('image/png'); // This already includes the "data:image/png;base64," part
+        const imageDataURL = canvas.toDataURL('image/png'); // Get base64 string
     
-        // Create a link element to download the image
-        const a = document.createElement("a");
-        a.href = imageDataURL; // Use the base64 string directly
-        a.download = "Image.png"; // Set the file name
-        a.click(); // Programmatically click the link to trigger the download
+        setLoading(true); // Show loading spinner
     
-        // Simulate loading state
-        setLoading(true);
-        setTimeout(() => {
-            setLoading(false); // Reset loading state
-        }, 1000);
+        try {
+            const response = await fetch('http://localhost:8000/save-image', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: imageDataURL }),
+            });
+    
+            const result = await response.json();
+            if (response.ok) {
+                console.log('Image saved at:', result.filePath);
+            } else {
+                console.error('Failed to save image:', result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        } finally {
+            setLoading(false); // Hide loading spinner
+        }
     };
 
     return (
