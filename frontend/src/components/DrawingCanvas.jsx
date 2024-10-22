@@ -98,14 +98,15 @@ const DrawingCanvas = () => {
 
     const calculateDrawing = () => {
         const canvas = canvasRef.current;
-        const imageDataURL = canvas.toDataURL('image/png'); // Convert canvas to base64
-        console.log(imageDataURL); // Log base64 image to console
-         
-        var a = document.createElement("a"); 
-        a.href = "data:image/png;base64," + imageDataURL; 
-        a.download = "Image.png"; 
-        a.click();
-        
+        const imageDataURL = canvas.toDataURL('image/png'); // This already includes the "data:image/png;base64," part
+    
+        // Create a link element to download the image
+        const a = document.createElement("a");
+        a.href = imageDataURL; // Use the base64 string directly
+        a.download = "Image.png"; // Set the file name
+        a.click(); // Programmatically click the link to trigger the download
+    
+        // Simulate loading state
         setLoading(true);
         setTimeout(() => {
             setLoading(false); // Reset loading state
