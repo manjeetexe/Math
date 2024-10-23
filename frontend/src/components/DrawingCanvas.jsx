@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { FaEraser } from 'react-icons/fa';
-import Modal from './Modal'; // Import the Modal component
+import Modal from './Modal';
 
 const DrawingCanvas = () => {
     const canvasRef = useRef(null);
@@ -10,8 +10,9 @@ const DrawingCanvas = () => {
     const [lineWidth, setLineWidth] = useState(5);
     const [isEraser, setIsEraser] = useState(false);
     const [selectedColor, setSelectedColor] = useState('white');
-    const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-    const [loading, setLoading] = useState(false); // State for loading feedback
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [answer, setAnswer] = useState(""); // State to store the answer
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -28,7 +29,7 @@ const DrawingCanvas = () => {
         const handleResize = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            resetCanvas(); // Clear the canvas when resizing
+            resetCanvas();
         };
 
         window.addEventListener('resize', handleResize);
@@ -82,6 +83,7 @@ const DrawingCanvas = () => {
         ctxRef.current.clearRect(0, 0, canvas.width, canvas.height);
         ctxRef.current.fillStyle = 'rgba(17, 17, 17, 0.99)';
         ctxRef.current.fillRect(0, 0, canvas.width, canvas.height);
+        setAnswer(""); // Reset the answer state
     };
 
     const toggleEraser = () => {
@@ -98,10 +100,10 @@ const DrawingCanvas = () => {
 
     const calculateDrawing = async () => {
         const canvas = canvasRef.current;
-        const imageDataURL = canvas.toDataURL('image/png'); // Get base64 string
-    
-        setLoading(true); // Show loading spinner
-    
+        const imageDataURL = canvas.toDataURL('image/png');
+
+        setLoading(true);
+
         try {
             const response = await fetch('http://localhost:8000/save-image', {
                 method: 'POST',
@@ -110,17 +112,23 @@ const DrawingCanvas = () => {
                 },
                 body: JSON.stringify({ image: imageDataURL }),
             });
-    
+
             const result = await response.json();
             if (response.ok) {
-                console.log('Image saved at:', result.filePath);
+                // Clear the canvas and display the answer
+                resetCanvas();
+                if (result.expr && result.result) {
+                    setAnswer(`${result.expr}=${result.result}`); // Set answer in the format "expr=result"
+                } else {
+                    console.error('Invalid response format:', result);
+                }
             } else {
                 console.error('Failed to save image:', result.message);
             }
         } catch (error) {
             console.error('Error:', error);
         } finally {
-            setLoading(false); // Hide loading spinner
+            setLoading(false);
         }
     };
 
@@ -134,7 +142,7 @@ const DrawingCanvas = () => {
                 className="absolute inset-0"
             />
 
-            {/* Color Palette on the Left (Horizontal) */}
+            {/* Color Selection */}
             <div className="absolute rounded-e-lg bg-gray-700 top-48 left-0 flex flex-col pl-6 pt-4 pb-4 pr-3 space-y-4">
                 {['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'black', 'white', 'brown'].map((color) => (
                     <button
@@ -146,24 +154,24 @@ const DrawingCanvas = () => {
                 ))}
             </div>
 
-            {/* Buttons on the Top Right */}
+            {/* Buttons for reset and calculate */}
             <div className="absolute top-4 right-4 space-x-3">
                 <button
                     onClick={resetCanvas}
                     className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
                 >
-                    Reset
+                    Reset All
                 </button>
                 <button
                     onClick={calculateDrawing}
                     className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    disabled={loading} // Disable button while loading
+                    disabled={loading}
                 >
                     {loading ? 'Calculating...' : 'Calculate'}
                 </button>
             </div>
 
-            {/* Thickness Slider in the Center */}
+            {/* Thickness Control */}
             <div className="absolute top-0 pt-5 rounded-b-lg bg-gray-700 w-80 px-7 pb-3 left-1/2 transform -translate-x-1/2">
                 <input
                     type="range"
@@ -176,7 +184,7 @@ const DrawingCanvas = () => {
                 <label className="text-white">Thickness: {lineWidth}px</label>
             </div>
 
-            {/* Eraser Button with Icon */}
+            {/* Eraser Button */}
             <div className="absolute top-32 left-2">
                 <button
                     onClick={toggleEraser}
@@ -186,7 +194,7 @@ const DrawingCanvas = () => {
                 </button>
             </div>
 
-            {/* Details and Donation Buttons */}
+            {/* Modal and additional buttons */}
             <div className="absolute top-4 left-4 space-x-3">
                 <button 
                     onClick={openModal}
@@ -199,7 +207,13 @@ const DrawingCanvas = () => {
                 </button>
             </div>
 
-            {/* Modal for Details */}
+            {/* Display Answer */}
+            {answer && (
+                <div className="absolute text-white text-3xl font-bold" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                    {answer}
+                </div>
+            )}
+
             <Modal isOpen={isModalOpen} onClose={closeModal} />
         </div>
     );
