@@ -12,7 +12,7 @@ const DrawingCanvas = () => {
     const [selectedColor, setSelectedColor] = useState('white');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [answer, setAnswer] = useState(""); // State to store the answer
+    const [answer, setAnswer] = useState(""); 
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -115,10 +115,10 @@ const DrawingCanvas = () => {
 
             const result = await response.json();
             if (response.ok) {
-                // Clear the canvas and display the answer
+                
                 resetCanvas();
                 if (result.expr && result.result) {
-                    setAnswer(`${result.expr}=${result.result}`); // Set answer in the format "expr=result"
+                    setAnswer(`${result.expr}=${result.result}`); 
                 } else {
                     console.error('Invalid response format:', result);
                 }
@@ -142,7 +142,7 @@ const DrawingCanvas = () => {
                 className="absolute inset-0"
             />
 
-            {/* Color Selection */}
+           
             <div className="absolute rounded-e-lg bg-gray-700 top-48 left-0 flex flex-col pl-6 pt-4 pb-4 pr-3 space-y-4">
                 {['red', 'green', 'blue', 'yellow', 'orange', 'purple', 'black', 'white', 'brown'].map((color) => (
                     <button
@@ -154,7 +154,7 @@ const DrawingCanvas = () => {
                 ))}
             </div>
 
-            {/* Buttons for reset and calculate */}
+            
             <div className="absolute top-4 right-4 space-x-3">
                 <button
                     onClick={resetCanvas}
@@ -171,7 +171,7 @@ const DrawingCanvas = () => {
                 </button>
             </div>
 
-            {/* Thickness Control */}
+          
             <div className="absolute top-0 pt-5 rounded-b-lg bg-gray-700 w-80 px-7 pb-3 left-1/2 transform -translate-x-1/2">
                 <input
                     type="range"
@@ -184,7 +184,7 @@ const DrawingCanvas = () => {
                 <label className="text-white">Thickness: {lineWidth}px</label>
             </div>
 
-            {/* Eraser Button */}
+        
             <div className="absolute top-32 left-2">
                 <button
                     onClick={toggleEraser}
@@ -194,7 +194,7 @@ const DrawingCanvas = () => {
                 </button>
             </div>
 
-            {/* Modal and additional buttons */}
+           
             <div className="absolute top-4 left-4 space-x-3">
                 <button 
                     onClick={openModal}
@@ -207,9 +207,9 @@ const DrawingCanvas = () => {
                 </button>
             </div>
 
-            {/* Display Answer */}
+           
             {answer && (
-                <div className="absolute text-white text-3xl font-bold" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+                <div className="absolute text-white text-[50px] font-bold" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
                     {answer}
                 </div>
             )}

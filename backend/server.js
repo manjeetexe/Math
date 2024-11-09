@@ -65,23 +65,23 @@ app.post('/save-image', (req, res) => {
 
     (async () => {
         try {
-            // Generate content using the comprehensive prompt and image data
+           
             const result = await model.generateContent([prompt, imageSend]);
 
-            // Log the raw response for debugging
+            
             let aiResponse = result.response.text();
             console.log("Raw AI response:", aiResponse);
 
-            // Clean up the AI response
+          
             aiResponse = aiResponse
-                .replace(/```json/g, '')    // Remove any markdown-like formatting
-                .replace(/```/g, '')        // Remove trailing backticks
-                .replace(/`/g, '')          // Remove backticks that might interfere
-                .trim();                    // Trim any extra whitespace
+                .replace(/```json/g, '')   
+                .replace(/```/g, '')        
+                .replace(/`/g, '')         
+                .trim();                    
 
             console.log("Cleaned AI response:", aiResponse);
 
-            // Try parsing the cleaned response
+           
             let parsedResponse;
             try {
                 parsedResponse = JSON.parse(aiResponse);
@@ -90,7 +90,7 @@ app.post('/save-image', (req, res) => {
                 return res.status(500).json({ message: 'Invalid response format from AI', error: jsonError.message });
             }
 
-            // Extract and send the first result back to the frontend
+          
             if (parsedResponse && Array.isArray(parsedResponse) && parsedResponse.length > 0) {
                 res.status(200).json(parsedResponse[0]);
             } else {
@@ -103,7 +103,7 @@ app.post('/save-image', (req, res) => {
         }
     })();
 
-    // Save the image locally
+   
     fs.writeFile(filePath, base64Data, 'base64', (err) => {
         if (err) {
             console.error('Error saving image:', err);
