@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const genAI = new GoogleGenerativeAI("AIzaSyC083OaLe0DQtpRhpLdWB5ojhNkm5XwHV8");
+const genAI = new GoogleGenerativeAI(process.env.APIKEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 const app = express();
 
